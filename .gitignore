@@ -1,2 +1,16 @@
+# Spark specific
+.*
 *.class
 *.log
+project
+target
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
