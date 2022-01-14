@@ -16,7 +16,7 @@ object Main extends App {
   // Import the datasets
   var (athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf) = importAllCSV(ss)
 
-  athletesDf = athletesDf.withColumn("athlete_medals", col("athlete_medals").cast(IntegerType))
+/*  athletesDf = athletesDf.withColumn("athlete_medals", col("athlete_medals").cast(IntegerType))
   athletesDf = athletesDf.withColumn("games_participations", col("games_participations").cast(IntegerType))
 
   athletesDf = athletesDf.drop("bio")
@@ -30,9 +30,11 @@ object Main extends App {
   athletesDf = athletesDf.na.fill(0, Array("athlete_medals", "games_participations"))
 
   athletesDf.show()
-  println(athletesDf.count())
+  println(athletesDf.count())*/
+
+
   // Clean the athletes dataset
-  // CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
-  CleaningService.clean()(athletesDf)
-  athletesDf.show()
+  //CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
+  val cleanedAthletesDf = CleaningService.clean()(athletesDf)
+  cleanedAthletesDf.show()
 }

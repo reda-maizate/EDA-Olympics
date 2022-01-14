@@ -16,13 +16,11 @@ object AthletesCleaning extends CleaningServiceTrait {
   }
 
   def castColumnTypeToIntegerType(colName: String)(df: DataFrame): DataFrame = {
-    val newDf = df.withColumn(colName, col(colName).cast(IntegerType))
-    newDf
+    df.withColumn(colName, col(colName).cast(IntegerType))
   }
 
   def dropUselessColumn(colName: String)(df: DataFrame): DataFrame = {
-    val newDf = df.drop(colName)
-    newDf
+    df.drop(colName)
   }
 
   /*
