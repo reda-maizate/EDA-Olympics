@@ -1,6 +1,7 @@
 import cleaning.CleaningService
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import importation.Importation.importAllCSV
+import org.apache.spark.sql
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.IntegerType
 
@@ -35,6 +36,6 @@ object Main extends App {
 
   // Clean the athletes dataset
   //CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
-  val cleanedAthletesDf = CleaningService.clean()(athletesDf)
-  cleanedAthletesDf.show()
+  var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
+  cleanedHostsDf.show(10)
 }

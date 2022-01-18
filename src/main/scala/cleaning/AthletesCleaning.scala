@@ -1,18 +1,22 @@
 package cleaning
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, lit, regexp_replace, split}
 import org.apache.spark.sql.types.IntegerType
 
 
 object AthletesCleaning extends CleaningServiceTrait {
-  def clean()(df: DataFrame): DataFrame = {
-    val transformedDf = df.transform(castColumnTypeToIntegerType("athlete_medals"))
-                          .transform(castColumnTypeToIntegerType("games_participations"))
-                          .transform(dropUselessColumn("bio"))
-
-    // dropUselessColumns(castColumnTypeToIntegerType(filterByNonNullValues(fillNullValues(col)))))
-    transformedDf
+   def clean(df: DataFrame): DataFrame = {
+    val df_transformed = df
+      .transform(castColumnTypeToIntegerType("games_participations"))
+      .transform(convertNullToZeroString("athlete_medals"))
+      .transform(convertColumnIntoMultipleColumns("athlete_medals"))
+      .transform(convertNullToZeroInt("games_participations"))
+      .transform(filterByNonNullValues("athlete_full_name"))
+      .transform(filterByNonNullValues("first_game"))
+      .transform(filterByNonNullValues("athlete_year_birth"))
+      .transform(dropUselessColumn("bio"))
+     df_transformed
   }
 
   def castColumnTypeToIntegerType(colName: String)(df: DataFrame): DataFrame = {
@@ -23,29 +27,20 @@ object AthletesCleaning extends CleaningServiceTrait {
     df.drop(colName)
   }
 
-  /*
-    def filterByNonNullValues(colName: String)(df: DataFrame): DataFrame = {
+  def convertColumnIntoMultipleColumns(colName: String)(df: DataFrame): DataFrame = {
+    val removedNewLines = df.withColumn(colName, regexp_replace(col(colName), lit("\n"), lit("")))
+    removedNewLines.withColumn(colName, split(col(colName), " "))
+  }
 
-    }
+  def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
+    df.na.fill(0, Seq(colName))
+  }
 
-    def fillNullValues(colName: String)(df: DataFrame): DataFrame = {
+  def convertNullToZeroString(colName: String)(df: DataFrame): DataFrame = {
+    df.na.fill("0", Seq(colName))
+  }
 
-    }
-
-    athletes_df = athletes_df.withColumn("athlete_medals", col("athlete_medals").cast(IntegerType))
-    athletes_df = athletes_df.withColumn("games_participations", col("games_participations").cast(IntegerType))
-
-    athletes_df = athletes_df.drop("bio")
-
-
-  athletes_df = athletes_df.where(athletes_df("athlete_full_name").isNotNull)
-  athletes_df = athletes_df.where(athletes_df("athlete_medals").isNull)
-  athletes_df = athletes_df.where(athletes_df("first_game").isNotNull)
-  athletes_df = athletes_df.where(athletes_df("athlete_year_birth").isNotNull)
-
-  athletes_df = athletes_df.na.fill(0, Array("athlete_medals", "games_participations"))
-
-  athletes_df.show()
-  println(athletes_df.count())
-   */
+  def filterByNonNullValues(colName: String)(df: DataFrame): DataFrame = {
+    df.filter(col(colName).isNotNull)
+  }
 }

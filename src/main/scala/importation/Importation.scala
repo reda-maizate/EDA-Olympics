@@ -7,6 +7,7 @@ object Importation {
     ss.read
       .option("header", "true")
       .option("inferSchema", "true")
+      .option("multiLine", "true")
       .csv(csvPath)
   }
 
