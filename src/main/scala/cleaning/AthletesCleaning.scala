@@ -3,7 +3,7 @@ package cleaning
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.{col, lit, regexp_replace, split}
 import org.apache.spark.sql.types.IntegerType
-import utils.filterByNonNullValues
+import helpers.filterByNonNullValues
 
 
 object AthletesCleaning extends CleaningServiceTrait {

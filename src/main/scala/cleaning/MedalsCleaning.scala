@@ -1,6 +1,6 @@
 package cleaning
 
-import cleaning.utils.filterByNonNullValues
+import cleaning.helpers.filterByNonNullValues
 import org.apache.spark.sql.DataFrame
 
 

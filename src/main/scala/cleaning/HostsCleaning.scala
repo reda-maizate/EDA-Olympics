@@ -1,7 +1,7 @@
 package cleaning
 
 import org.apache.spark.sql.DataFrame
-import utils.filterByNonNullValues
+import helpers.filterByNonNullValues
 
 
 object HostsCleaning extends CleaningServiceTrait {
