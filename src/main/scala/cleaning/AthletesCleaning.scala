@@ -34,15 +34,16 @@ object AthletesCleaning extends CleaningServiceTrait {
   def convertColumnIntoMultipleColumns(colName: String)(df: DataFrame): DataFrame = {
     // TODO
     val removedNewLines = df.withColumn(colName, regexp_replace(col(colName), lit("\n"), lit("")))
-    val splitByGoldMedals = removedNewLines.withColumn(colName, split(col(colName), "G"))
-    val createColumnGoldMedals = splitByGoldMedals.withColumn("gold_medals", col(colName)(0).cast("int"))
-    val removeGoldMedals = createColumnGoldMedals.withColumn(colName, when(size(col(colName)) > 1, col(colName)(1)).otherwise(col(colName)(0)))
-    val splitBySilverMedals = removeGoldMedals.withColumn(colName, split(col(colName), "S"))
-    val createColumnSilverMedals = splitBySilverMedals.withColumn("silver_medals", col(colName)(0).cast("int"))
-    val removeSilverMedals = createColumnSilverMedals.withColumn(colName, when(size(col(colName)) > 1, col(colName)(1)).otherwise(col(colName)(0)))
-    val splitByBronzeMedals = removeSilverMedals.withColumn(colName, split(col(colName), "B"))
-    val createColumnBronzeMedals = splitByBronzeMedals.withColumn("bronze_medals", col(colName)(0).cast("int"))
-    createColumnBronzeMedals
+    val getGoldMedals = removedNewLines.transform(extractMedalsByCategories(colName, "gold_medals", "G"))
+    val getSilverMedals = getGoldMedals.transform(extractMedalsByCategories(colName, "silver_medals", "S"))
+    val getBronzeMedals = getSilverMedals.transform(extractMedalsByCategories(colName, "bronze_medals", "B"))
+    getBronzeMedals
+  }
+
+  def extractMedalsByCategories(colName: String, newColName: String, delimiter: String)(df: DataFrame): DataFrame = {
+    val splitByGoldMedals = df.withColumn(colName, split(col(colName), delimiter))
+    val createColumnGoldMedals = splitByGoldMedals.withColumn(newColName, col(colName)(0).cast("int"))
+    createColumnGoldMedals.withColumn(colName, when(size(col(colName)) > 1, col(colName)(1)).otherwise(col(colName)(0)))
   }
 
   def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
