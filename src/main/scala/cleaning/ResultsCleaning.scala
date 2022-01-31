@@ -8,15 +8,12 @@ import org.apache.spark.sql.types.IntegerType
 object ResultsCleaning extends CleaningServiceTrait {
   def clean(df: DataFrame): DataFrame = {
     val df_transformed = df
-    /*
-    .transform(castColumnTypeToIntegerType("games_participations"))
-    .transform(convertNullToZeroString("athlete_medals"))
-    .transform(convertColumnIntoMultipleColumns("athlete_medals"))
-    .transform(convertNullToZeroInt("games_participations"))
-    .transform(filterByNonNullValues("athlete_full_name"))
-    .transform(filterByNonNullValues("first_game"))
-    .transform(filterByNonNullValues("athlete_year_birth"))
-    .transform(dropUselessColumn("bio"))*/
+      .transform(castColumnTypeToIntegerType("rank_position"))
+      .transform(convertNullToZeroInt("rank_position"))
+      .transform(filterByNonNullValues("rank_position"))
+      .transform(filterByNonNullValues("country_code"))
+      .transform(dropUselessColumn("value_unit"))
+      .transform(dropUselessColumn("value_type"))
     df_transformed
   }
 
@@ -26,11 +23,6 @@ object ResultsCleaning extends CleaningServiceTrait {
 
   def dropUselessColumn(colName: String)(df: DataFrame): DataFrame = {
     df.drop(colName)
-  }
-
-  def convertColumnIntoMultipleColumns(colName: String)(df: DataFrame): DataFrame = {
-    val removedNewLines = df.withColumn(colName, regexp_replace(col(colName), lit("\n"), lit("")))
-    removedNewLines.withColumn(colName, split(col(colName), " "))
   }
 
   def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
