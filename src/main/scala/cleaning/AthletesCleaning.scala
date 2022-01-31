@@ -41,9 +41,10 @@ object AthletesCleaning extends CleaningServiceTrait {
   }
 
   def extractMedalsByCategories(colName: String, newColName: String, delimiter: String)(df: DataFrame): DataFrame = {
-    val splitByGoldMedals = df.withColumn(colName, split(col(colName), delimiter))
-    val createColumnGoldMedals = splitByGoldMedals.withColumn(newColName, col(colName)(0).cast("int"))
-    createColumnGoldMedals.withColumn(colName, when(size(col(colName)) > 1, col(colName)(1)).otherwise(col(colName)(0)))
+    val splitByMedals = df.withColumn(colName, split(col(colName), delimiter))
+    val createColumnMedals = splitByMedals.withColumn(newColName, col(colName)(0).cast("int"))
+    val removeTreatedMedals = createColumnMedals.withColumn(colName, when(size(col(colName)) > 1, col(colName)(1)).otherwise(col(colName)(0)))
+    removeTreatedMedals
   }
 
   def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
