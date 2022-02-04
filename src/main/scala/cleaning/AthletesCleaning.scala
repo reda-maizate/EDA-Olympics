@@ -1,7 +1,7 @@
 package cleaning
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{col, length, lit, regexp_replace, size, split, when}
+import org.apache.spark.sql.functions.{col, lit, regexp_replace, size, split, when}
 import org.apache.spark.sql.types.IntegerType
 import helpers.filterByNonNullValues
 
@@ -32,7 +32,6 @@ object AthletesCleaning extends CleaningServiceTrait {
   }
 
   def convertColumnIntoMultipleColumns(colName: String)(df: DataFrame): DataFrame = {
-    // TODO
     val removedNewLines = df.withColumn(colName, regexp_replace(col(colName), lit("\n"), lit("")))
     val getGoldMedals = removedNewLines.transform(extractMedalsByCategories(colName, "gold_medals", "G"))
     val getSilverMedals = getGoldMedals.transform(extractMedalsByCategories(colName, "silver_medals", "S"))
