@@ -19,7 +19,6 @@ object AthletesCleaning extends CleaningServiceTrait {
       .transform(filterByNonNullValues("first_game"))
       .transform(filterByNonNullValues("athlete_year_birth"))
       .transform(dropUselessColumn("athlete_medals"))
-      .transform(dropUselessColumn("bio"))
      df_transformed
   }
 
