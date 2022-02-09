@@ -1,8 +1,9 @@
 package cleaning
 
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.{array, col, concat, expr, lit, map_from_arrays, map_values, regexp_replace, split, struct, transform, typedLit, when}
+import org.apache.spark.sql.functions.{col, regexp_replace, when}
 import org.apache.spark.sql.types.IntegerType
+import helpers.filterByNonNullValues
 
 
 object ResultsCleaning extends CleaningServiceTrait {
@@ -26,9 +27,7 @@ object ResultsCleaning extends CleaningServiceTrait {
     val df_remove_url = df_clean_column.withColumn("temp", regexp_replace(col("temp"), "\\'https?://\\S+\\s?\\'", ""))
     val df_create_separator = df_remove_url.withColumn("temp", regexp_replace(col("temp"), "(.*?\\'\\s?){2}", "$0,"))
     val df_remove_quote = df_create_separator.withColumn("temp", regexp_replace(col("temp"), "\\'\\s?", ""))
-    val df_split_names = df_remove_quote.withColumn("temp", split(col("temp"), ","))
-    val df_string_to_array = df_split_names.withColumn(colTargetName, array(col(colTargetName)))
-    val df_join_cols = df_string_to_array.withColumn(colTargetName, when(col("temp").isNull, col(colTargetName)).otherwise(col("temp")))
+    val df_join_cols = df_remove_quote.withColumn(colTargetName, when(col("temp").isNull, col(colTargetName)).otherwise(col("temp")))
     df_join_cols
   }
 
@@ -38,17 +37,5 @@ object ResultsCleaning extends CleaningServiceTrait {
 
   def dropUselessColumn(colName: String)(df: DataFrame): DataFrame = {
     df.drop(colName)
-  }
-
-  def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
-    df.na.fill(0, Seq(colName))
-  }
-
-  def convertNullToZeroString(colName: String)(df: DataFrame): DataFrame = {
-    df.na.fill("0", Seq(colName))
-  }
-
-  def filterByNonNullValues(colName: String)(df: DataFrame): DataFrame = {
-    df.filter(col(colName).isNotNull)
   }
 }

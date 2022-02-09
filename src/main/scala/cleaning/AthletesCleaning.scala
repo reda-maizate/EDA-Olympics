@@ -48,8 +48,4 @@ object AthletesCleaning extends CleaningServiceTrait {
   def convertNullToZeroInt(colName: String)(df: DataFrame): DataFrame = {
     df.na.fill(0, Seq(colName))
   }
-
-  def convertNullToZeroString(colName: String)(df: DataFrame): DataFrame = {
-    df.na.fill("0", Seq(colName))
-  }
 }
