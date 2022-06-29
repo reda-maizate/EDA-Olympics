@@ -1,7 +1,7 @@
 import cleaning.CleaningService
 import dfToCsv.ExportDF
 import org.apache.spark.sql.SparkSession
-import importation.Importation.{readAllMessage}
+import importation.Importation.readAllMessage
 
 object Main extends App {
   val ss = SparkSession
