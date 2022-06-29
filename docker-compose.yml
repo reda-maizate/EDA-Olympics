@@ -32,8 +32,6 @@ services:
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
-      kafka-topics --bootstrap-server kafka:29092 --list
-
       echo -e 'Creating kafka topics'
       kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic athletes --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic hosts --replication-factor 1 --partitions 1
