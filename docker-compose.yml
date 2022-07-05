@@ -122,13 +122,29 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-
   airflow-init:
     <<: *airflow-common
     entrypoint: /bin/bash
     # yamllint disable rule:line-length
-    # command:
-    #   - version
+    command:
+      - -c
+      - |
+        function ver() {
+          printf "%04d%04d%04d%04d" $${1//./ }
+        }
+        airflow_version=$$(AIRFLOW__LOGGING__LOGGING_LEVEL=INFO && gosu airflow airflow version)
+        airflow_version_comparable=$$(ver $${airflow_version})
+        min_airflow_version=2.2.0
+        min_airflow_version_comparable=$$(ver $${min_airflow_version})
+        one_meg=1048576
+        mem_available=$$(($$(getconf _PHYS_PAGES) * $$(getconf PAGE_SIZE) / one_meg))
+        cpus_available=$$(grep -cE 'cpu[0-9]+' /proc/stat)
+        disk_available=$$(df / | tail -1 | awk '{print $$4}')
+        warning_resources="false"
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    # yamllint enable rule:line-length
     environment:
       <<: *airflow-common-env
       _AIRFLOW_DB_UPGRADE: 'true'
@@ -191,7 +207,7 @@ services:
     ports:
       - "9092:9092"
     expose:
-      - '29092'
+      - '9092'
     depends_on:
       - zookeeper
     environment:
@@ -199,6 +215,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -214,7 +231,6 @@ services:
       kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic athletes --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic hosts --replication-factor 1 --partitions 1
       kafka-topics.sh --bootstrap-server kafka:29092 --create --if-not-exists --topic medals --replication-factor 1 --partitions 1
-
       echo -e 'Successfully created the following topics:'
       kafka-topics.sh --bootstrap-server kafka:29092 --list
       "
