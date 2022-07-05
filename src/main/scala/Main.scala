@@ -13,11 +13,13 @@ object Main extends App {
   ss.sparkContext.setLogLevel("ERROR")
 
   // Import the datasets
-  var (athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf) = readAllMessage(ss)
+  //var (athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf) = readAllMessage(ss)
+  var athletesDf = readAllMessage(ss)
+
 
   // Cleaning the dataframes
-  var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
+  //var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
 
   // Export the dataframes to .csv
-  ExportDF.exportAllDataframe(List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf))
+  //ExportDF.exportAllDataframe(List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf))
 }

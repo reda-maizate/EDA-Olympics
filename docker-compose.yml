@@ -214,7 +214,7 @@ services:
       kafka-topics.sh --bootstrap-server kafka:9093 --create --if-not-exists --topic medals --replication-factor 1 --partitions 1
 
       echo -e 'Successfully created the following topics:'
-      kafka-topics.sh --bootstrap-server kafka:29092 --list
+      kafka-topics.sh --bootstrap-server kafka:9093 --list
       "
 
 volumes:
