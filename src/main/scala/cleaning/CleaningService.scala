@@ -9,11 +9,6 @@ trait CleaningServiceTrait {
 object CleaningService {
   def clean(df: DataFrame): DataFrame = {
     val cleanedAthletesDf = AthletesCleaning.clean(df)
-    //val cleanedHostsDf = HostsCleaning.clean(dfs(1))
-    //val cleanedMedalsDf = MedalsCleaning.clean(dfs(2))
-    //val cleanedResultsDf = ResultsCleaning.clean(dfs(3))
-    //val cleanedDopingCasesDf = DopingCasesCleaning.clean(dfs(4))
     cleanedAthletesDf
-    //List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf)
   }
 }

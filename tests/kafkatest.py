@@ -9,13 +9,17 @@ dotenv_path = os.path.join(*['..']*3, '.env')
 
 producer = KafkaProducer(bootstrap_servers='0.0.0.0:9092', api_version=(0, 10, 2))
 
-columns = ["athlete_url", "athlete_full_name", "first_game", "athlete_year_birth", "athlete_medals", "games_participations"]
-data = ["https://olympics.com/en/athletes/dongqi-chen","Dongqi CHEN","Tokyo 2020","1988.0","2B", "3"]
+columns_athletes = ["athlete_url", "athlete_full_name", "first_game", "athlete_year_birth", "athlete_medals", "games_participations"]
+data_athletes = ["https://olympics.com/en/athletes/dongqi-chen","Dongqi CHEN","Tokyo 2020","1988.0","2B", "3"]
+columns_hosts = ["game_slug", "game_end_date", "game_start_date", "game_location", "game_name", "game_season", "game_year"]
+data_hosts = ["tokyo-2020","2021-08-08T14:00:00Z","2021-07-23T11:00:00Z","Japan", "Tokyo 2020", "Summer", "2020"]
 
-print("data sent: ", json.dumps(dict(zip(columns, data))))
+print("athletes data sent: ", json.dumps(dict(zip(columns_athletes, data_athletes))))
+print("hosts data sent: ", json.dumps(dict(zip(columns_hosts, data_hosts))))
 
 while True:
-    producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
+    producer.send(topic="athletes", value=json.dumps(dict(zip(columns_athletes, data_athletes))).encode('utf-8'))
+    producer.send(topic="hosts", value=json.dumps(dict(zip(columns_hosts, data_hosts))).encode('utf-8'))
     print("data sent")
     sleep(5)
 

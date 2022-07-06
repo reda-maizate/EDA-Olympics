@@ -1,5 +1,5 @@
 import cleaning.CleaningService
-import dfToCsv.ExportDF
+import dfToQueue.ExportToKafka
 import org.apache.spark.sql.SparkSession
 import importation.Importation.readAllMessage
 
@@ -12,20 +12,12 @@ object Main extends App {
 
   ss.sparkContext.setLogLevel("ERROR")
 
-  // Import the datasets
-  //var (athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf) = readAllMessage(ss)
+  // Read the messages from the Kafka topic
   var athletesDf = readAllMessage(ss)
 
-
   // Cleaning the dataframes
-  // var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
   var cleanedAthletesDf = CleaningService.clean(athletesDf)
-  cleanedAthletesDf
-  .writeStream
-  .format("console")
-  .outputMode("append")
-  .start().awaitTermination()
 
-  // Export the dataframes to .csv
-  //ExportDF.exportAllDataframe(List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf))
+  // Export the dataframe to Kafka
+  ExportToKafka.sendDataFramesToKafka(cleanedAthletesDf)
 }
