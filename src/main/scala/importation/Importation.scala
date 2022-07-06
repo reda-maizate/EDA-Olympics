@@ -1,43 +1,44 @@
 package importation
 
+import org.apache.spark.sql.functions.from_json
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+
 object Importation {
-  def _importCSV(ss: SparkSession, csvPath: String): DataFrame = {
-    ss.read
-      .option("header", "true")
-      .option("inferSchema", "true")
-      .option("multiLine", "true")
-      .csv(csvPath)
+  def _readMessageFromKafka(ss: SparkSession, topic: String): DataFrame = {
+    ss.readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", "localhost:9092")
+      .option("subscribe", topic)
+      .option("startingOffsets", "latest")
+      .option("failOnDataLoss", "false")
+      .load()
+      .selectExpr("CAST(value AS STRING)")
   }
 
-  def importAthletesCSV(ss: SparkSession): DataFrame = {
-    _importCSV(ss, "src/main/data/olympics/olympic_athletes.csv")
+  def readAthletesMessage(ss: SparkSession): DataFrame = {
+    println("Reading message for Athletes in the Kafka topic")
+    val df = _readMessageFromKafka(ss, "athletes")
+
+    val athletesSchema: StructType = StructType(Seq(
+      StructField("athlete_url", StringType, true),
+      StructField("athlete_full_name", StringType, true),
+      StructField("first_game", StringType, true),
+      StructField("athlete_year_birth", StringType, true),
+      StructField("athlete_medals", StringType, true),
+      StructField("games_participations", IntegerType, true)
+    ))
+
+    import ss.implicits._
+    println("Message for Athletes readed")
+    df.selectExpr("CAST(value AS STRING)")
+      .select(from_json($"value", athletesSchema).as("data"))
+      .select("data.*")
   }
 
-  def importHostsCSV(ss: SparkSession): DataFrame = {
-    _importCSV(ss, "src/main/data/olympics/olympic_hosts.csv")
-  }
-
-  def importMedalsCSV(ss: SparkSession): DataFrame = {
-    _importCSV(ss, "src/main/data/olympics/olympic_medals.csv")
-  }
-
-  def importResultsCSV(ss: SparkSession): DataFrame = {
-    _importCSV(ss, "src/main/data/olympics/olympic_results.csv")
-  }
-
-  def importDopingCasesCSV(ss: SparkSession): DataFrame = {
-    _importCSV(ss, "src/main/data/List_of_doping_cases_in_athletics.csv")
-  }
-
-  def importAllCSV(ss: SparkSession): (DataFrame, DataFrame, DataFrame, DataFrame, DataFrame) = {
-    val athletesDf = importAthletesCSV(ss)
-    val hostsDf = importHostsCSV(ss)
-    val medalsDf = importMedalsCSV(ss)
-    val resultsDf = importResultsCSV(ss)
-    val dopingCasesDf = importDopingCasesCSV(ss)
-
-    (athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf)
+  def readAllMessage(ss: SparkSession): DataFrame = {
+    val athletesDf = readAthletesMessage(ss)
+    athletesDf
   }
 }
