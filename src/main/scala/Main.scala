@@ -18,7 +18,13 @@ object Main extends App {
 
 
   // Cleaning the dataframes
-  //var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
+  // var List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf) = CleaningService.clean(List(athletesDf, hostsDf, medalsDf, resultsDf, dopingCasesDf))
+  var cleanedAthletesDf = CleaningService.clean(athletesDf)
+  cleanedAthletesDf
+  .writeStream
+  .format("console")
+  .outputMode("append")
+  .start().awaitTermination()
 
   // Export the dataframes to .csv
   //ExportDF.exportAllDataframe(List(cleanedAthletesDf, cleanedHostsDf, cleanedMedalsDf, cleanedResultsDf, cleanedDopingCasesDf))

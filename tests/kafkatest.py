@@ -9,18 +9,15 @@ dotenv_path = os.path.join(*['..']*3, '.env')
 
 producer = KafkaProducer(bootstrap_servers='0.0.0.0:9092', api_version=(0, 10, 2))
 
-columns = ["link", "firstname", "name", "event", "year", "medal1", "medal2", "medal3", "medal4"]
-data = ["https://olympics.com/en/athletes/dongqi-chen","Dongqi", "CHEN","Tokyo 2020",1988.0,0,0,0,0]
+columns = ["athlete_url", "athlete_full_name", "first_game", "athlete_year_birth", "athlete_medals", "games_participations"]
+data = ["https://olympics.com/en/athletes/dongqi-chen","Dongqi CHEN","Tokyo 2020","1988.0","2B", "3"]
 
 print("data sent: ", json.dumps(dict(zip(columns, data))))
 
 while True:
     producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
-    producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
-    producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
-    producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
-    producer.send(topic="athletes", value=json.dumps(dict(zip(columns, data))).encode('utf-8'))
-    sleep(500)
+    print("data sent")
+    sleep(5)
 
 # producer.send(topic="athletes", value=b"a").get(timeout=10)
 print("Message sent")

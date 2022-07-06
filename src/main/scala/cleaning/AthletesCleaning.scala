@@ -11,6 +11,7 @@ object AthletesCleaning extends CleaningServiceTrait {
     val df_transformed = df
       .transform(castColumnTypeToIntegerType("games_participations"))
       .transform(convertColumnIntoMultipleColumns("athlete_medals"))
+      .transform(dropUselessColumn("athlete_medals"))
       .transform(convertNullToZeroInt("games_participations"))
       .transform(convertNullToZeroInt("gold_medals"))
       .transform(convertNullToZeroInt("silver_medals"))
@@ -18,7 +19,6 @@ object AthletesCleaning extends CleaningServiceTrait {
       .transform(filterByNonNullValues("athlete_full_name"))
       .transform(filterByNonNullValues("first_game"))
       .transform(filterByNonNullValues("athlete_year_birth"))
-      .transform(dropUselessColumn("athlete_medals"))
      df_transformed
   }
 

@@ -3,7 +3,7 @@ package importation
 import org.apache.spark.sql.functions.from_json
 import org.apache.spark.sql.streaming.Trigger
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 
 object Importation {
   /*def _importCSV(ss: SparkSession, csvPath: String): DataFrame = {
@@ -17,26 +17,23 @@ object Importation {
   def _readMessageFromKafka(ss: SparkSession, topic: String): DataFrame = {
     ss.readStream
       .format("kafka")
-      .option("kafka.bootstrap.servers", "host.docker.internal:9092")
+      .option("kafka.bootstrap.servers", "localhost:9092")
       .option("subscribe", topic)
       .option("startingOffsets", "earliest")
       .load()
+      .selectExpr("CAST(value AS STRING)")
   }
-
 
   def readAthletesMessage(ss: SparkSession): DataFrame = {
     println("Reading message for Athletes in the Kafka topic")
     val df = _readMessageFromKafka(ss, "athletes")
     val athletesSchema: StructType = StructType(Seq(
-      StructField("link", StringType, true),
-      StructField("firstname", StringType, true),
-      StructField("name", StringType, true),
-      StructField("event", StringType, true),
-      StructField("year", IntegerType, true),
-      StructField("medal1", IntegerType, true),
-      StructField("medal2", IntegerType, true),
-      StructField("medal3", IntegerType, true),
-      StructField("medal4", IntegerType, true),
+      StructField("athlete_url", StringType, true),
+      StructField("athlete_full_name", StringType, true),
+      StructField("first_game", StringType, true),
+      StructField("athlete_year_birth", StringType, true),
+      StructField("athlete_medals", StringType, true),
+      StructField("games_participations", IntegerType, true)
     ))
 
     import ss.implicits._
@@ -44,8 +41,6 @@ object Importation {
     df.selectExpr("CAST(value AS STRING)")
       .select(from_json($"value", athletesSchema).as("data"))
       .select("data.*")
-
-    //df.select(from_json($"data".cast(StringType), athletesSchema))
   }
 
   def readHostsMessage(ss: SparkSession): DataFrame = {
@@ -67,13 +62,13 @@ object Importation {
   def readAllMessage(ss: SparkSession): (DataFrame) = {
     val athletesDf = readAthletesMessage(ss)
     println("Athletes dataframe")
-    val query = athletesDf
-    .writeStream
-    .format("console")
-    .outputMode("append")
-    .start()
+    //val query = athletesDf
+    //.writeStream
+    //.format("console")
+    //.outputMode("append")
+    //.start()
 
-    query.awaitTermination()
+    //query.awaitTermination()
 
     //val hostsDf = readHostsMessage(ss)
     //val medalsDf = readMedalsMessage(ss)
